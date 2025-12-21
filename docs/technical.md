@@ -6,7 +6,7 @@
 **Engine:** Godot 4.5  
 **Animation:** AnimatedSprite2D + AnimationTree  
 **Backend:** Supabase (PostgreSQL + Realtime)  
-**Auth:** Supabase Auth (Google OAuth) + QR Device Linking
+**Auth:** Supabase Auth (Google OAuth) + Alphanumeric Device Linking
 
 ---
 
@@ -42,22 +42,23 @@ Parent authenticates via Supabase Auth with Google OAuth:
 2. Supabase creates/retrieves user with `parent_uid`
 3. App creates family record in PostgreSQL
 
-### 2.2 QR Code Device Linking (Child Tablet)
+### 2.2 Alphanumeric Device Linking (Child Tablet)
 
 **Flow:**
 
-1. Child tablet launches → Shows "Waiting for Parent" screen with QR code
-2. QR contains: `{ "linkToken": "<one-time-token>", "deviceId": "<tablet_device_id>" }`
-3. Parent scans QR from their phone
-4. Parent's phone writes to Supabase: `linked_devices` table
-5. Tablet detects link via Realtime subscription → Transitions to child selection screen
-6. Parent (on phone) or child (on tablet) selects which child profile to use
+1. Child tablet launches → Shows "Link Device" screen with 6-digit entry.
+2. Parent dashboard → Generates 6-digit code (linkToken).
+3. Code contains: `{ "linkToken": "ABC-123", "familyId": "<uuid>" }`.
+4. Child enters code on their screen.
+5. Handshake: Child device provides its unique ID to Supabase `link_sessions`.
+6. Parent detects link via Realtime → Creates permanent record in `linked_devices`.
+7. Tablet detects link via Realtime → Transitions to Hero View.
 
 **Security:**
 
-- Link tokens expire after 5 minutes
-- One-time use (invalidated after successful link)
-- Parent can revoke device links from settings
+- Link tokens expire after 5 minutes.
+- Multi-instance testing uses isolated settings files (`user://settings_{idx}.cfg`).
+- Debug builds randomize Device IDs to prevent machine conflicts.
 
 ### 2.3 Supabase Row Level Security
 
@@ -104,38 +105,24 @@ CREATE TABLE families (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Children table (no PII - display names stored locally)
-CREATE TABLE children (
+-- Link Sessions table (Handshake)
+CREATE TABLE link_sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     family_id UUID REFERENCES families(id) ON DELETE CASCADE,
-    avatar_id TEXT NOT NULL,
-    preferred_theme TEXT DEFAULT 'dino',
+    link_code TEXT UNIQUE NOT NULL,
+    claimed_by_device TEXT,
+    expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Sessions table (real-time synced)
-CREATE TABLE sessions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
-    child_id UUID REFERENCES children(id) ON DELETE CASCADE,
-    active_habit TEXT,
-    session_state TEXT DEFAULT 'IDLE'
-        CHECK (session_state IN ('IDLE', 'ACTIVE', 'PENDING_APPROVAL', 'SUCCESS')),
-    theme_id TEXT DEFAULT 'dino',
-    nudge_timestamp TIMESTAMPTZ,
-    cutoff_time TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(child_id)
 );
 
 -- Linked devices
 CREATE TABLE linked_devices (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     family_id UUID REFERENCES families(id) ON DELETE CASCADE,
-    device_id TEXT UNIQUE NOT NULL,
-    assigned_child_id UUID REFERENCES children(id),
+    device_id TEXT NOT NULL,
     linked_at TIMESTAMPTZ DEFAULT NOW(),
-    last_seen TIMESTAMPTZ DEFAULT NOW()
+    last_seen TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(family_id, device_id)
 );
 
 -- Inventory (stickers)
@@ -636,57 +623,30 @@ func hide_offline_screen():
 ```
 tinyhero/
 ├── project.godot
-├── export_presets.cfg
+├── README.md
 │
 ├── assets/
 │   ├── sprites/
-│   │   └── dino/
-│   │       ├── dino_idle.png
-│   │       ├── dino_active.png
-│   │       └── ...
 │   ├── audio/
-│   │   ├── sfx/
-│   │   └── music/
-│   ├── fonts/
-│   └── ui/
+│   └── fonts/
+│
+├── scenes/
+│   ├── auth/                     # Login & OAuth UI
+│   ├── parent_mode/              # Commander Dashboard UI
+│   ├── child_mode/               # Hero View UI
+│   └── main.tscn                 # Entry point (Smart Router)
 │
 ├── src/
 │   ├── autoload/
+│   │   ├── env.gd                # Credentials (Git Ignored)
 │   │   ├── game_manager.gd       # App state, mode switching
-│   │   ├── supabase_client.gd    # Backend singleton
-│   │   └── session_manager.gd    # Real-time session sync
+│   │   └── supabase_client.gd    # Backend singleton
 │   │
-│   ├── core/
-│   │   ├── models/
-│   │   │   ├── family.gd
-│   │   │   ├── child_profile.gd
-│   │   │   └── session.gd
-│   │   └── constants/
-│   │       ├── habits.gd
-│   │       └── stickers.gd
-│   │
-│   ├── parent_mode/
-│   │   ├── scenes/
-│   │   │   ├── parent_dashboard.tscn
-│   │   │   ├── habit_selection.tscn
-│   │   │   ├── theme_selection.tscn
-│   │   │   └── active_session.tscn
-│   │   └── scripts/
-│   │       └── ...
-│   │
-│   └── child_mode/
-│       ├── scenes/
-│       │   ├── child_view.tscn
-│       │   ├── waiting_screen.tscn
-│       │   └── qr_code_display.tscn
-│       └── scripts/
-│           └── character_controller.gd
+│   ├── parent_mode/              # Parent logic scripts
+│   ├── child_mode/               # Hero logic scripts
+│   └── shared/                   # Common logic & scenes (ParentGate)
 │
-└── scenes/
-    ├── main.tscn                  # Entry point, mode detection
-    └── shared/
-        ├── loading.tscn
-        └── offline_indicator.tscn
+└── docs/                         # PRD, Technical, Roadmap
 ```
 
 ---

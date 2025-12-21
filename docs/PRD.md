@@ -44,8 +44,9 @@ TinyHero is a real-time, two-device habit-building system designed for toddlers.
 
 ### 3.2 Child Tablet Linking
 
-- Tablet displays QR code on first launch
-- Parent scans QR from their phone to link
+- Tablet displays "Link Device" invitation on first launch
+- Parent generates 6-digit alphanumeric code from their phone
+- Parent enters code on child device (or child enters it)
 - Link tokens expire after 5 minutes (security)
 - Multiple tablets supported per family
 
@@ -157,9 +158,9 @@ families (id, parent_uid, email, created_at)
 
 ### 7.3 Toddler-Proofing (Child Mode)
 
-- **No-Exit UI:** No menus, back buttons, or navigation bars visible.
-- **Parent Gate:** Exit requires 3-second long-press on bottom-left corner.
-- **Optional PIN:** Parent can enable 4-digit PIN for added security.
+- **No-Exit UI:** No menus, back buttons, or navigation bars visible in Hero Mode.
+- **Parent Gate:** Exit requires 3-second long-press anywhere on the screen while the gate overlay is active.
+- **Visual Feedback:** Dynamic progress indicator shows the 3s hold filling up.
 - **Interaction Logic:** Touch interactions create fun character reactions.
 
 ---
@@ -234,11 +235,12 @@ families (id, parent_uid, email, created_at)
 - Google OAuth login flow
 - Family record creation
 
-### Sprint 2: Device Linking
+### Sprint 2: Device Linking ✅
 
-- QR code generation and scanning
-- Link validation and device registration
-- Multi-child selection UI
+- 6-digit alphanumeric code handshake
+- Real-time link validation and registration
+- Secure "Parent Gate" logic
+- Multi-instance debug support
 
 ### Sprint 3: Child Tablet UI
 

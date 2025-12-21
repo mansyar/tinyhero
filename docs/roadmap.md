@@ -16,11 +16,10 @@ This document tracks the development progress of TinyHero across 6 sprints. Each
 | Sprint | Name                   | Status         | Progress |
 | ------ | ---------------------- | -------------- | -------- |
 | 1      | Godot & Supabase Setup | ✅ Complete    | 100%     |
-| 2      | Device Linking         | 🟡 In Progress | 0%       |
-| 3      | Child Tablet UI        | ⬜ Not Started | 0%       |
-| 4      | Animation System       | ⬜ Not Started | 0%       |
-| 5      | Parent Dashboard       | ⬜ Not Started | 0%       |
-| 6      | Inventory & Polish     | ⬜ Not Started | 0%       |
+| 2      | Device Linking         | ✅ Complete    | 100%     |
+| 3      | The Dino (MVP Loop)    | 🟡 In Progress | 0%       |
+| 4      | Parent Dashboard       | ⬜ Not Started | 0%       |
+| 5      | Inventory & Polish     | ⬜ Not Started | 0%       |
 
 **Legend:** ⬜ Not Started | 🟡 In Progress | ✅ Complete
 
@@ -88,15 +87,15 @@ Enable parent phone to link with child tablet via QR code handshake.
 
 ### Features
 
-| #   | Feature               | Status | Notes                        |
-| --- | --------------------- | ------ | ---------------------------- |
-| 2.1 | Device mode detection | ⬜     | Parent phone vs child tablet |
-| 2.2 | QR code generation    | ⬜     | Child tablet displays QR     |
-| 2.3 | QR code scanning      | ⬜     | Parent phone scans           |
-| 2.4 | Link token validation | ⬜     | Token expires after 5 min    |
-| 2.5 | Device registration   | ⬜     | Store in linked_devices      |
-| 2.6 | Child assignment      | ⬜     | Assign child to device       |
-| 2.7 | Realtime subscription | ⬜     | Tablet listens for link      |
+| #   | Feature                | Status | Notes                        |
+| --- | ---------------------- | ------ | ---------------------------- |
+| 2.1 | Device mode detection  | ✅     | Auto-routing in GameManager  |
+| 2.2 | 6-digit code generator | ✅     | Replaced QR for MVP/Desktop  |
+| 2.3 | Parent-side Linking UI | ✅     | Real-time session monitoring |
+| 2.4 | Code entry & Handshake | ✅     | Claiming logic in Supabase   |
+| 2.5 | Device registration    | ✅     | Permanent links in DB        |
+| 2.6 | Session Persistence    | ✅     | Auto-login via Device ID     |
+| 2.7 | Parent Gate (Secure)   | ✅     | 3s hold to exit Hero Mode    |
 
 ### Files to Create
 
@@ -118,14 +117,14 @@ src/
 
 ### Acceptance Criteria
 
-- [ ] App detects if running on phone or tablet
-- [ ] Child tablet shows QR code on first launch
-- [ ] QR code contains valid JSON payload
-- [ ] Parent can scan QR code to link tablet
-- [ ] Link token expires after 5 minutes
-- [ ] Parent can assign child to linked device
-- [ ] Linked devices appear in Supabase
-- [ ] Tablet transitions to waiting screen after link
+- [x] App detects if running on phone or tablet
+- [x] Child tablet shows "Enter Code" screen on first launch
+- [x] Parent generates 6-digit numeric code
+- [x] Parent can enter code on child device to link
+- [x] Link token expires after 5 minutes
+- [x] Permanent handshake established via Realtime
+- [x] Linked devices appear in Supabase
+- [x] Tablet transitions to Hero Mode after link
 
 ---
 
