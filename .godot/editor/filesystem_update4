@@ -1,0 +1,8 @@
+res://src/core/auth/google_oauth.gd
+res://scenes/auth/login_screen.gd
+res://addons/supabase/Supabase/supabase.gd
+res://src/autoload/supabase_client.gd
+res://addons/supabase/Auth/auth_task.gd
+res://scenes/main.gd
+res://src/autoload/game_manager.gd
+res://addons/supabase/Auth/auth.gd
