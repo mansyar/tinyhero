@@ -4,11 +4,14 @@ extends Control
 @onready var login_button = %LoginButton
 @onready var status_label = %StatusLabel
 @onready var link_input = %LinkInput
+@onready var setup_child_button = %SetupChildButton
+
 
 var oauth: GoogleOAuth
 
 func _ready():
 	login_button.pressed.connect(_on_login_pressed)
+	setup_child_button.pressed.connect(_on_setup_child_pressed)
 	link_input.text_submitted.connect(_on_link_submitted)
 	
 	oauth = GoogleOAuth.new()
@@ -22,7 +25,12 @@ func _on_login_pressed():
 	status_label.text = "Opening browser..."
 	oauth.start_google_login()
 
+func _on_setup_child_pressed():
+	# Switch to child mode and reload
+	GameManager.switch_to_child_mode()
+
 func _on_link_submitted(text: String):
+
 	if text.begins_with("com.tinyhero.app://") or text.begins_with("http://localhost"):
 		status_label.text = "Processing manual link..."
 		oauth.handle_deep_link(text)

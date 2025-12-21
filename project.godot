@@ -18,10 +18,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Env="*res://src/autoload/env.gd"
 SupabaseClient="*res://src/autoload/supabase_client.gd"
 GameManager="*res://src/autoload/game_manager.gd"
-
+Env="*res://src/autoload/env.gd"
 
 [display]
 
@@ -31,8 +30,11 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
 
-[input_devices]
+[gui]
 
+theme/custom_font="res://assets/fonts/Inter-Regular.ttf"
+
+[input_devices]
 
 pointing/emulate_touch_from_mouse=true
 

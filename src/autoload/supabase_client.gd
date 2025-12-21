@@ -47,19 +47,28 @@ func create_family(parent_uid: String, email: String) -> Dictionary:
 var _realtime_client: RealtimeClient
 
 # Realtime subscription
-func subscribe_to_sessions(family_id: String, callback: Callable):
+func subscribe_to_table(table: String, filter: String, callback: Callable):
 	if _realtime_client == null:
 		_realtime_client = supabase.realtime.client()
 		_realtime_client.connect_client()
 		await _realtime_client.connected
 	
-	var channel = _realtime_client.channel("public", "sessions", "family_id=eq." + family_id)
+	var channel = _realtime_client.channel("public", table, filter)
 	
 	# The 4.x plugin uses signals: update, insert, delete, all
-	# We map them to a dictionary format similar to what we planned
 	channel.update.connect(func(old_record, new_record, _chan): 
-		callback.call({"new": new_record, "old": old_record})
+		callback.call({"new": new_record, "old": old_record, "event": "UPDATE"})
+	)
+	channel.insert.connect(func(new_record, _chan):
+		callback.call({"new": new_record, "event": "INSERT"})
 	)
 	
 	channel.subscribe()
+
+func subscribe_to_sessions(family_id: String, callback: Callable):
+	subscribe_to_table("sessions", "family_id=eq." + family_id, callback)
+
+func subscribe_to_link_sessions(family_id: String, callback: Callable):
+	subscribe_to_table("link_sessions", "family_id=eq." + family_id, callback)
+
 
