@@ -18,8 +18,10 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+Env="*res://src/autoload/env.gd"
 SupabaseClient="*res://src/autoload/supabase_client.gd"
 GameManager="*res://src/autoload/game_manager.gd"
+
 
 [display]
 

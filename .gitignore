@@ -1,0 +1,29 @@
+# Godot-specific ignores
+.godot/
+*.import
+export_presets.cfg
+*.translation
+
+# Build and export artifacts
+build/
+bin/
+*.apk
+*.aab
+*.exe
+*.zip
+*.dmg
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Secrets and Config
+.env
+src/autoload/env.gd
+
+
+
+
+*.pck
+
+override.cfg

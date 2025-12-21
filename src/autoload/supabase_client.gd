@@ -1,21 +1,30 @@
 # autoload/supabase_client.gd
 extends Node
 
-# NOTE TO USER: Fill these in your project settings or env
-const SUPABASE_URL = "https://uqvwmuulxcbkgtwmtnxp.supabase.co"
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdndtdXVseGNia2d0d210bnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMTY4MTMsImV4cCI6MjA4MTg5MjgxM30.-yz162J5PaGJhWMwuh6ghHXRJBpr8mi2e1owyZdTi2A"
+var SUPABASE_URL = ""
+var SUPABASE_ANON_KEY = ""
+
 
 var supabase: Supabase
 
 func _ready():
+	# Use the global Autoload instance
+	var env = get_node_or_null("/root/Env")
+	if env:
+		SUPABASE_URL = env.SUPABASE_URL
+		SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY
+	
 	if SUPABASE_URL == "" or SUPABASE_ANON_KEY == "":
-		push_warning("TinyHero: Supabase URL or Anon Key is missing. Please configure them in supabase_client.gd")
+		push_warning("TinyHero: Supabase credentials missing in Env.gd")
 		return
+
 		
 	supabase = Supabase.new()
 	supabase.set_config(SUPABASE_URL, SUPABASE_ANON_KEY)
 	add_child(supabase)
-	print("TinyHero: Supabase Client Initialized")
+	print("TinyHero: Supabase Client Initialized via Env.gd")
+
+
 
 
 # Database queries
