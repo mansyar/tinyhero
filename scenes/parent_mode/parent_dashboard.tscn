@@ -56,24 +56,118 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 text = "Family ID: ---"
 
-[node name="Grid" type="GridContainer" parent="Margin/VBox"]
+[node name="HSeparator" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="HabitSelectionUI" type="VBoxContainer" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="Label" type="Label" parent="Margin/VBox/HabitSelectionUI"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Select a Habit for Hero:"
+
+[node name="Catalog" type="GridContainer" parent="Margin/VBox/HabitSelectionUI"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 20
 columns = 2
 
-[node name="LinkDevice" type="Button" parent="Margin/VBox/Grid"]
+[node name="BrushingHabit" type="Button" parent="Margin/VBox/HabitSelectionUI/Catalog"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "Link Hero Tablet"
+text = "🦷 Brushing Teeth"
 
-[node name="SwitchMode" type="Button" parent="Margin/VBox/Grid"]
+[node name="TidyingHabit" type="Button" parent="Margin/VBox/HabitSelectionUI/Catalog"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "Switch to Hero Mode"
+text = "🧸 Tidying Toys"
+
+[node name="BedtimeHabit" type="Button" parent="Margin/VBox/HabitSelectionUI/Catalog"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "🌙 Get Ready for Bed"
+
+[node name="EatingHabit" type="Button" parent="Margin/VBox/HabitSelectionUI/Catalog"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "🥦 Eating Veggies"
+
+[node name="ActiveSessionUI" type="VBoxContainer" parent="Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="Panel" type="PanelContainer" parent="Margin/VBox/ActiveSessionUI"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBox" type="VBoxContainer" parent="Margin/VBox/ActiveSessionUI/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="ActiveHabitLabel" type="Label" parent="Margin/VBox/ActiveSessionUI/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Hero is: BRUSHING"
+horizontal_alignment = 1
+
+[node name="SessionStatusLabel" type="Label" parent="Margin/VBox/ActiveSessionUI/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Status: ACTIVE"
+horizontal_alignment = 1
+
+[node name="Controls" type="HBoxContainer" parent="Margin/VBox/ActiveSessionUI"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Nudge" type="Button" parent="Margin/VBox/ActiveSessionUI/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "📣 NUDGE"
+
+[node name="Complete" type="Button" parent="Margin/VBox/ActiveSessionUI/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "✅ APPROVE"
+
+[node name="Cancel" type="Button" parent="Margin/VBox/ActiveSessionUI/Controls"]
+layout_mode = 2
+text = "❌ Stop Session"
+
+[node name="ConfigGrid" type="GridContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+columns = 2
+
+[node name="LinkDevice" type="Button" parent="Margin/VBox/ConfigGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Link New Tablet"
+
+[node name="SwitchMode" type="Button" parent="Margin/VBox/ConfigGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hero Mode"
 
 [node name="Footer" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
@@ -83,6 +177,13 @@ layout_mode = 2
 text = "Log Out"
 flat = true
 
-[connection signal="pressed" from="Margin/VBox/Grid/LinkDevice" to="." method="_on_link_device_pressed"]
-[connection signal="pressed" from="Margin/VBox/Grid/SwitchMode" to="." method="_on_switch_mode_pressed"]
+[connection signal="pressed" from="Margin/VBox/HabitSelectionUI/Catalog/BrushingHabit" to="." method="_on_start_habit_pressed" binds= ["brushing"]]
+[connection signal="pressed" from="Margin/VBox/HabitSelectionUI/Catalog/TidyingHabit" to="." method="_on_start_habit_pressed" binds= ["tidying"]]
+[connection signal="pressed" from="Margin/VBox/HabitSelectionUI/Catalog/BedtimeHabit" to="." method="_on_start_habit_pressed" binds= ["bedtime"]]
+[connection signal="pressed" from="Margin/VBox/HabitSelectionUI/Catalog/EatingHabit" to="." method="_on_start_habit_pressed" binds= ["eating"]]
+[connection signal="pressed" from="Margin/VBox/ActiveSessionUI/Controls/Nudge" to="." method="_on_nudge_pressed"]
+[connection signal="pressed" from="Margin/VBox/ActiveSessionUI/Controls/Complete" to="." method="_on_complete_pressed"]
+[connection signal="pressed" from="Margin/VBox/ActiveSessionUI/Controls/Cancel" to="." method="_on_cancel_session_pressed"]
+[connection signal="pressed" from="Margin/VBox/ConfigGrid/LinkDevice" to="." method="_on_link_device_pressed"]
+[connection signal="pressed" from="Margin/VBox/ConfigGrid/SwitchMode" to="." method="_on_switch_mode_pressed"]
 [connection signal="pressed" from="Margin/VBox/Footer/Logout" to="." method="_on_logout_pressed"]

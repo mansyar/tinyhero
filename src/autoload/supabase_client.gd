@@ -54,16 +54,34 @@ func subscribe_to_table(table: String, filter: String, callback: Callable):
 		await _realtime_client.connected
 	
 	var channel = _realtime_client.channel("public", table, filter)
+	print("TinyHero: Subscribing to: ", channel.topic)
 	
-	# The 4.x plugin uses signals: update, insert, delete, all
-	channel.update.connect(func(old_record, new_record, _chan): 
-		callback.call({"new": new_record, "old": old_record, "event": "UPDATE"})
+	# Safety check: Avoid duplicate connections if the signal is already connected to a lambda
+	# However, since we use inline lambdas, it's hard to check for exact equality.
+	# We will rely on is_valid() during execution to clean up zombie calls.
+	
+	channel.update.connect(func(old_record, record, _chan): 
+		if callback.is_valid():
+			print("TinyHero: REALTIME UPDATE received on ", table)
+			callback.call({"new": record, "old": old_record, "event": "UPDATE"})
+		else:
+			# If the callback is invalid, we don't disconnect here (signal management is complex)
+			# but we prevent the crash.
+			pass
 	)
-	channel.insert.connect(func(new_record, _chan):
-		callback.call({"new": new_record, "event": "INSERT"})
+	channel.insert.connect(func(record, _chan):
+		if callback.is_valid():
+			print("TinyHero: REALTIME INSERT received on ", table)
+			callback.call({"new": record, "event": "INSERT"})
+	)
+	channel.delete.connect(func(old_record, _chan):
+		if callback.is_valid():
+			print("TinyHero: REALTIME DELETE received on ", table)
+			callback.call({"old": old_record, "event": "DELETE"})
 	)
 	
 	channel.subscribe()
+	print("TinyHero: Subscription call sent for ", table)
 
 func subscribe_to_sessions(family_id: String, callback: Callable):
 	subscribe_to_table("sessions", "family_id=eq." + family_id, callback)
@@ -71,4 +89,65 @@ func subscribe_to_sessions(family_id: String, callback: Callable):
 func subscribe_to_link_sessions(family_id: String, callback: Callable):
 	subscribe_to_table("link_sessions", "family_id=eq." + family_id, callback)
 
+# Habit Session Management
+func start_session(family_id: String, habit_id: String, theme_id: String = "dino") -> Dictionary:
+	# 1. Check if a session already exists for this family
+	var find_query = SupabaseQuery.new().from("sessions").select().eq("family_id", family_id)
+	var find_task = supabase.database.query(find_query)
+	await find_task.completed
+	
+	var data = {
+		"family_id": family_id,
+		"active_habit": habit_id,
+		"theme_id": theme_id,
+		"session_state": "ACTIVE",
+		"updated_at": Time.get_datetime_string_from_system(true)
+	}
+	
+	var final_task
+	if find_task.data is Array and find_task.data.size() > 0:
+		print("TinyHero: Session exists. Updating...")
+		var session_id = find_task.data[0].id
+		var update_query = SupabaseQuery.new().from("sessions").update(data).eq("id", session_id)
+		final_task = supabase.database.query(update_query)
+	else:
+		print("TinyHero: Creating new session...")
+		var insert_data = [data]
+		var insert_query = SupabaseQuery.new().from("sessions").insert(insert_data)
+		final_task = supabase.database.query(insert_query)
+	
+	await final_task.completed
+	
+	if final_task.error:
+		print("TinyHero: start_session DB ERROR: ", final_task.error)
+		return {}
+		
+	print("TinyHero: start_session success.")
+	return final_task.data[0] if final_task.data is Array and final_task.data.size() > 0 else {}
 
+func nudge_session(session_id: String):
+	var data = {"nudge_timestamp": Time.get_datetime_string_from_system(true)}
+	var query = SupabaseQuery.new().from("sessions").update(data).eq("id", session_id)
+	var task = supabase.database.query(query)
+	await task.completed
+
+func approve_session(session_id: String):
+	var data = {"session_state": "SUCCESS"}
+	var query = SupabaseQuery.new().from("sessions").update(data).eq("id", session_id)
+	var task = supabase.database.query(query)
+	await task.completed
+
+func end_session(session_id: String):
+	print("TinyHero: DB RESET call for session: ", session_id)
+	var data = {
+		"session_state": "IDLE",
+		"active_habit": "",
+		"updated_at": Time.get_datetime_string_from_system(true)
+	}
+	var query = SupabaseQuery.new().from("sessions").update(data).eq("id", session_id)
+	var task = supabase.database.query(query)
+	await task.completed
+	if task.error:
+		print("TinyHero: end_session DB ERROR: ", task.error)
+	else:
+		print("TinyHero: end_session (IDLE) DB Success.")

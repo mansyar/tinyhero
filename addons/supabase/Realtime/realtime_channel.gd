@@ -32,7 +32,7 @@ func on(event: String, callable: Callable) -> RealtimeChannel:
 
 func subscribe() -> RealtimeChannel:
 	if subscribed: 
-		_client._error("Already subscribed to topic: %s" % topic)
+		_client.error.emit({"message": "Already subscribed to topic: %s" % topic})
 		return self
 	_client.send_message({
 		topic = topic,
@@ -45,7 +45,7 @@ func subscribe() -> RealtimeChannel:
 
 func unsubscribe() -> RealtimeChannel:
 	if not subscribed: 
-		_client._error("Already unsubscribed from topic: %s" % topic)
+		_client.error.emit({"message": "Already unsubscribed from topic: %s" % topic})
 		return self
 	_client.send_message({
 		topic = topic,

@@ -17,8 +17,8 @@ This document tracks the development progress of TinyHero across 6 sprints. Each
 | ------ | ---------------------- | -------------- | -------- |
 | 1      | Godot & Supabase Setup | ✅ Complete    | 100%     |
 | 2      | Device Linking         | ✅ Complete    | 100%     |
-| 3      | The Dino (MVP Loop)    | 🟡 In Progress | 0%       |
-| 4      | Parent Dashboard       | ⬜ Not Started | 0%       |
+| 3      | The Dino & MVP Loop    | ✅ Complete    | 100%     |
+| 4      | Progress & Rewards     | 🟡 In Progress | 10%      |
 | 5      | Inventory & Polish     | ⬜ Not Started | 0%       |
 
 **Legend:** ⬜ Not Started | 🟡 In Progress | ✅ Complete
@@ -136,14 +136,14 @@ Build the child-facing tablet interface with all UI states.
 
 ### Features
 
-| #   | Feature             | Status | Notes                           |
-| --- | ------------------- | ------ | ------------------------------- |
-| 3.1 | Waiting screen      | ⬜     | Pre-session, waiting for parent |
-| 3.2 | Session screen      | ⬜     | Active task display             |
-| 3.3 | Sleepy overlay      | ⬜     | Missed deadline state           |
-| 3.4 | Reward claim screen | ⬜     | Post-success sticker reveal     |
-| 3.5 | Fullscreen mode     | ⬜     | Hide system bars                |
-| 3.6 | Realtime listener   | ⬜     | Session updates from Supabase   |
+| #   | Feature            | Status | Notes                           |
+| --- | ------------------ | ------ | ------------------------------- |
+| 3.1 | Waiting screen     | ✅     | Status Label + Sleeping Dino    |
+| 3.2 | Session screen     | ✅     | Active task with Dino Brushing  |
+| 3.3 | Realtime Sync      | ✅     | Parent Phone ↔ Tablet Handshake |
+| 3.4 | Nudge Mechanism    | ✅     | Roar pop & Screen Shake         |
+| 3.5 | Approval Loop      | ✅     | Succession celebration          |
+| 3.6 | Manual Transitions | ✅     | AnimationTree state machine     |
 
 ### Files to Create
 
@@ -163,34 +163,31 @@ src/
 
 ### Acceptance Criteria
 
-- [ ] Waiting screen shows when no active session
-- [ ] Session screen shows when session is ACTIVE
-- [ ] Sleepy overlay appears when cutoff time passes
-- [ ] Reward screen shows after parent approval
-- [ ] Long-press (1.5s) claims sticker reward
-- [ ] Screen returns to waiting after claim complete
-- [ ] System bars hidden in fullscreen mode
-- [ ] Real-time updates from Supabase work
+- [x] Waiting screen shows when no active session
+- [x] Session screen shows when session is ACTIVE
+- [x] Dino animations (Idle, Brushing, Happy, Nudge)
+- [x] Succession celebration after parent approval
+- [x] Real-time updates via Supabase Realtime
+- [x] Manual "Finish & Reset" to close the habit loop
 
 ---
 
-## Sprint 4: Animation System
+## Sprint 4: Progress & Rewards
 
 ### Objective
 
-Integrate AnimatedSprite2D with AnimationTree state machine and wire to Supabase state.
+Implement time-bound missions, visual progress bars, reward selection, and audio assets.
 
 ### Features
 
-| #   | Feature                     | Status | Notes                      |
-| --- | --------------------------- | ------ | -------------------------- |
-| 4.1 | Placeholder spritesheets    | ⬜     | From Kenney.nl (CC0)       |
-| 4.2 | AnimatedSprite2D setup      | ⬜     | SpriteFrames resource      |
-| 4.3 | AnimationTree state machine | ⬜     | All required states        |
-| 4.4 | Boolean conditions          | ⬜     | is_active, is_sleepy       |
-| 4.5 | One-shot animations         | ⬜     | nudge, success, tap        |
-| 4.6 | Supabase → Animation sync   | ⬜     | Session state → animations |
-| 4.7 | Haptic feedback             | ⬜     | On nudge and tap           |
+| #   | Feature                | Status | Notes                       |
+| --- | ---------------------- | ------ | --------------------------- |
+| 4.1 | SQL Schema Migration   | ⬜     | New timer/reward columns    |
+| 4.2 | Mission Duration (m/s) | ⬜     | Parent selection UI         |
+| 4.3 | Progress Bar (Hero)    | ⬜     | Beauty/Theme-aware bar      |
+| 4.4 | Reward Reveal (Box)    | ⬜     | Sticker unboxing animation  |
+| 4.5 | Asset Gathering (SFX)  | ⬜     | Roar, Fanfare, Button sound |
+| 4.6 | Timer Synchronization  | ⬜     | Resumption on app restart   |
 
 ### Files to Create
 

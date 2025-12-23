@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://child_view"]
 
 [ext_resource type="Script" path="res://src/child_mode/child_view.gd" id="1_child"]
-[ext_resource type="PackedScene" path="res://src/shared/parent_gate.tscn" id="2_gate"]
+[ext_resource type="PackedScene" uid="uid://parent_gate" path="res://src/shared/parent_gate.tscn" id="2_gate"]
 
 [node name="ChildView" type="Control"]
 layout_mode = 3
@@ -19,49 +19,55 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.15, 0.2, 0.25, 1)
+color = Color(0.12, 0.45, 0.12, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
 
-[node name="VBox" type="VBoxContainer" parent="Center"]
+[node name="VBox" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 40
+alignment = 1
 
-[node name="DinoPlaceholder" type="Label" parent="Center/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 120
-text = "🦖"
-horizontal_alignment = 1
-
-[node name="StatusLabel" type="Label" parent="Center/VBox"]
+[node name="StatusLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Hero Mode"
+text = "Waiting for Mission..."
 horizontal_alignment = 1
 
-[node name="SwitchToParent" type="Button" parent="."]
+[node name="Control" type="Control" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+
+[node name="HeroAnchor" type="Marker2D" parent="Margin/VBox/Control"]
+unique_name_in_owner = true
+position = Vector2(540, 200)
+
+[node name="ParentMenuButton" type="Button" parent="."]
 layout_mode = 1
-anchors_preset = 1
+anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -150.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = 51.0
+offset_top = -80.0
+offset_right = -40.0
+offset_bottom = -40.0
 grow_horizontal = 0
+grow_vertical = 0
 text = "Parent Menu"
-flat = true
 
 [node name="ParentGate" parent="." instance=ExtResource("2_gate")]
-unique_name_in_owner = true
-visible = false
 layout_mode = 1
 
-[connection signal="pressed" from="SwitchToParent" to="." method="_on_switch_to_parent_pressed"]
+[connection signal="pressed" from="ParentMenuButton" to="." method="_on_switch_to_parent_pressed"]

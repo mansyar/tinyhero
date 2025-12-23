@@ -125,19 +125,43 @@ CREATE TABLE linked_devices (
     UNIQUE(family_id, device_id)
 );
 
+-- Sessions table (Synced in Real-time)
+CREATE TABLE sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
+    active_habit TEXT,
+    session_state TEXT DEFAULT 'IDLE' CHECK (session_state IN ('IDLE', 'ACTIVE', 'PENDING_APPROVAL', 'SUCCESS')),
+    theme_id TEXT DEFAULT 'dino',
+    nudge_timestamp TIMESTAMPTZ,
+    cutoff_time TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(family_id)
+);
+
 -- Inventory (stickers)
 CREATE TABLE inventory (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    child_id UUID REFERENCES children(id) ON DELETE CASCADE,
+    family_id UUID REFERENCES families(id) ON DELETE CASCADE,
     sticker_id TEXT NOT NULL,
     earned_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable real-time for sessions
+-- Enable real-time for relevant tables
 ALTER PUBLICATION supabase_realtime ADD TABLE sessions;
+ALTER PUBLICATION supabase_realtime ADD TABLE link_sessions;
 ```
 
-### 3.2 Local Storage (Parent Device Only)
+### 3.2 Roadmap to Multi-Child
+
+> [!NOTE] > **Why Family-ID instead of Child-ID for MVP?**  
+> To get the **Hero Handshake** working quickly, we are syncing habits at the `family_id` level. This allows us to test the Dino's animations and real-time triggers without building the "Add Child" and "Child Profile" systems yet.
+>
+> **The Evolution:**
+>
+> 1. **Sprint 3 (Current):** One active habit per family. All linked tablets react.
+> 2. **Sprint 5:** We add the `children` table. The `sessions` table will be updated to use `child_id`, allowing different children to have different habits simultaneously.
+
+### 3.3 Local Storage (Parent Device Only)
 
 ```gdscript
 # Using Godot's ConfigFile for local storage
