@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://src/child_mode/child_view.gd" id="1_child"]
 [ext_resource type="PackedScene" uid="uid://parent_gate" path="res://src/shared/parent_gate.tscn" id="2_gate"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/bone_empty.png" id="3_empty"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/bone_fill.png" id="4_fill"]
 
 [node name="ChildView" type="Control"]
 layout_mode = 3
@@ -43,6 +45,33 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Waiting for Mission..."
 horizontal_alignment = 1
+
+[node name="MissionUI" type="VBoxContainer" parent="Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TimerLabel" type="Label" parent="Margin/VBox/MissionUI"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="BoneProgressBar" type="TextureProgressBar" parent="Margin/VBox/MissionUI"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 40
+stretch_margin_top = 10
+stretch_margin_right = 40
+stretch_margin_bottom = 10
+texture_under = ExtResource("3_empty")
+texture_progress = ExtResource("4_fill")
 
 [node name="Control" type="Control" parent="Margin/VBox"]
 custom_minimum_size = Vector2(0, 400)

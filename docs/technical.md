@@ -134,6 +134,7 @@ CREATE TABLE sessions (
     theme_id TEXT DEFAULT 'dino',
     nudge_timestamp TIMESTAMPTZ,
     cutoff_time TIMESTAMPTZ,
+    duration_seconds INTEGER DEFAULT 120,
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(family_id)
 );

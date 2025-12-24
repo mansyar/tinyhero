@@ -8,6 +8,27 @@ func _ready():
 	_setup_gate()
 	_setup_character()
 	_listen_for_sessions()
+	%MissionUI.hide()
+
+func _process(_delta):
+	if %MissionUI.visible and _cutoff_unix > 0:
+		var time_left = max(0, _cutoff_unix - Time.get_unix_time_from_system())
+		
+		# Update Timer label
+		var mins = int(time_left / 60.0)
+		var secs = int(time_left) % 60
+		%TimerLabel.text = "%02d:%02d" % [mins, secs]
+		
+		# Update Progress Bar
+		if _duration_secs > 0:
+			var progress = (1.0 - (float(time_left) / _duration_secs)) * 100.0
+			%BoneProgressBar.value = progress
+			
+		# Handle automatic transition to SLEEPY if needed? 
+		# (Roadmap says parent handles nudge/approve, but sleepy can be local)
+		if time_left <= 0:
+			# For now just show 00:00. Sleepy state logic could be added here.
+			pass
 
 func _setup_gate():
 	# SELF-HEALING: If the scene structure is broken, spawn the gate manually
@@ -62,6 +83,8 @@ func _on_session_update(payload: Dictionary):
 	var event = payload.get("event", "")
 	var session = payload.get("new", {})
 	
+	_current_session_id = session.get("id", "")
+	
 	var state = session.get("session_state", "IDLE")
 	if state == null: state = "IDLE"
 	
@@ -79,6 +102,18 @@ func _on_session_update(payload: Dictionary):
 	if nudge != "" and nudge != _last_nudge:
 		_on_nudge_received()
 		_last_nudge = nudge
+
+	var duration = session.get("duration_seconds", 0)
+	var cutoff = session.get("cutoff_time", "")
+	
+	if state == "ACTIVE":
+		%MissionUI.show()
+		_duration_secs = int(duration)
+		if cutoff != "" and cutoff != null:
+			_cutoff_unix = Time.get_unix_time_from_datetime_string(cutoff)
+	else:
+		%MissionUI.hide()
+		_cutoff_unix = 0
 	
 	_set_hero_state(state, habit)
 
@@ -92,6 +127,7 @@ func _set_hero_state(state: String, habit: String = ""):
 		"SUCCESS":
 			character.set_state(character.State.SUCCESS)
 			%StatusLabel.text = "MISSION COMPLETE!"
+			_show_reward_reveal()
 		"IDLE":
 			character.set_state(character.State.IDLE)
 			%StatusLabel.text = "Waiting for Mission..."
@@ -110,8 +146,30 @@ func _on_nudge_received():
 	if OS.has_feature("mobile"):
 		Input.vibrate_handheld(200)
 
+func _show_reward_reveal():
+	# Avoid duplicate reveals
+	if has_node("RewardReveal"): return
+	
+	var scene = load("res://scenes/child_mode/reward_reveal.tscn")
+	if scene:
+		var reveal = scene.instantiate()
+		reveal.name = "RewardReveal"
+		add_child(reveal)
+		reveal.start_reveal()
+		# When reward is claimed, we reset locally. 
+		# The Parent will also reset via their "Finish" button.
+		reveal.reward_claimed.connect(func(): 
+			print("TinyHero: Reward claimed, resetting Hero and Session state.")
+			if _current_session_id != "":
+				SupabaseClient.end_session(_current_session_id)
+			_set_hero_state("IDLE")
+		)
+
 var character: Node2D
 var _last_nudge: String = ""
+var _current_session_id: String = ""
+var _duration_secs: int = 0
+var _cutoff_unix: float = 0.0
 
 func _on_switch_to_parent_pressed():
 	if gate and gate.has_method("open_gate"):

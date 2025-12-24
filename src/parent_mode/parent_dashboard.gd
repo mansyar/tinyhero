@@ -8,6 +8,9 @@ func _ready():
 	_setup_ui()
 	_load_family_data()
 	_listen_for_sessions()
+	
+	if %DurationSlider:
+		%DurationSlider.value_changed.connect(_on_duration_changed)
 
 func _setup_ui():
 	family_id_label.text = "Family ID: " + GameManager.family_id
@@ -66,9 +69,13 @@ var _current_session_id = ""
 
 # --- Signal Handlers ---
 
+func _on_duration_changed(val: float):
+	%DurationLabel.text = "Mission Duration: " + str(int(val)) + " minutes"
+
 func _on_start_habit_pressed(habit_id: String):
 	print("TinyHero: Starting habit: ", habit_id)
-	await SupabaseClient.start_session(GameManager.family_id, habit_id)
+	var duration_secs = int(%DurationSlider.value) * 60
+	await SupabaseClient.start_session(GameManager.family_id, habit_id, "dino", duration_secs)
 
 func _on_nudge_pressed():
 	if _current_session_id != "":

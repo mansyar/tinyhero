@@ -90,7 +90,7 @@ func subscribe_to_link_sessions(family_id: String, callback: Callable):
 	subscribe_to_table("link_sessions", "family_id=eq." + family_id, callback)
 
 # Habit Session Management
-func start_session(family_id: String, habit_id: String, theme_id: String = "dino") -> Dictionary:
+func start_session(family_id: String, habit_id: String, theme_id: String = "dino", duration_secs: int = 120) -> Dictionary:
 	# 1. Check if a session already exists for this family
 	var find_query = SupabaseQuery.new().from("sessions").select().eq("family_id", family_id)
 	var find_task = supabase.database.query(find_query)
@@ -101,6 +101,8 @@ func start_session(family_id: String, habit_id: String, theme_id: String = "dino
 		"active_habit": habit_id,
 		"theme_id": theme_id,
 		"session_state": "ACTIVE",
+		"duration_seconds": duration_secs,
+		"cutoff_time": Time.get_datetime_string_from_unix_time(int(Time.get_unix_time_from_system() + duration_secs), true),
 		"updated_at": Time.get_datetime_string_from_system(true)
 	}
 	
@@ -142,6 +144,8 @@ func end_session(session_id: String):
 	var data = {
 		"session_state": "IDLE",
 		"active_habit": "",
+		"duration_seconds": 0,
+		"cutoff_time": null,
 		"updated_at": Time.get_datetime_string_from_system(true)
 	}
 	var query = SupabaseQuery.new().from("sessions").update(data).eq("id", session_id)

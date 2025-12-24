@@ -18,8 +18,9 @@ This document tracks the development progress of TinyHero across 6 sprints. Each
 | 1      | Godot & Supabase Setup | ✅ Complete    | 100%     |
 | 2      | Device Linking         | ✅ Complete    | 100%     |
 | 3      | The Dino & MVP Loop    | ✅ Complete    | 100%     |
-| 4      | Progress & Rewards     | 🟡 In Progress | 10%      |
-| 5      | Inventory & Polish     | ⬜ Not Started | 0%       |
+| 4      | Progress & Rewards     | ✅ Complete    | 100%     |
+| 5      | Parent Dashboard       | ⬜ Not Started | 0%       |
+| 6      | Inventory & Polish     | ⬜ Not Started | 0%       |
 
 **Legend:** ⬜ Not Started | 🟡 In Progress | ✅ Complete
 
@@ -182,12 +183,12 @@ Implement time-bound missions, visual progress bars, reward selection, and audio
 
 | #   | Feature                | Status | Notes                       |
 | --- | ---------------------- | ------ | --------------------------- |
-| 4.1 | SQL Schema Migration   | ⬜     | New timer/reward columns    |
-| 4.2 | Mission Duration (m/s) | ⬜     | Parent selection UI         |
-| 4.3 | Progress Bar (Hero)    | ⬜     | Beauty/Theme-aware bar      |
-| 4.4 | Reward Reveal (Box)    | ⬜     | Sticker unboxing animation  |
-| 4.5 | Asset Gathering (SFX)  | ⬜     | Roar, Fanfare, Button sound |
-| 4.6 | Timer Synchronization  | ⬜     | Resumption on app restart   |
+| 4.1 | SQL Schema Migration   | ✅     | `duration_seconds` added    |
+| 4.2 | Mission Duration (m/s) | ✅     | Slider in Parent Dashboard  |
+| 4.3 | Progress Bar (Hero)    | ✅     | Bone-themed bar             |
+| 4.4 | Reward Reveal (Box)    | ✅     | Egg crack animation         |
+| 4.5 | Asset Gathering (SFX)  | ✅     | Roar, Fanfare, Button sound |
+| 4.6 | Timer Synchronization  | ✅     | Uses cutoff_time + duration |
 
 ### Files to Create
 
@@ -219,13 +220,13 @@ src/
 
 ### Acceptance Criteria
 
-- [ ] Placeholder spritesheets load successfully
-- [ ] AnimationTree state machine transitions work
-- [ ] Boolean states update correctly
-- [ ] One-shot animations fire correctly
-- [ ] Supabase session changes → animation state changes
-- [ ] Haptic feedback on nudge (heavy) and tap (light)
-- [ ] Child can tap screen for fun reactions
+- [x] Placeholder spritesheets load successfully
+- [x] AnimationTree state machine transitions work
+- [x] Boolean states update correctly
+- [x] One-shot animations fire correctly
+- [x] Supabase session changes → animation state changes
+- [x] Haptic feedback on nudge (heavy) and tap (light)
+- [x] Child can tap screen for fun reactions
 
 ---
 

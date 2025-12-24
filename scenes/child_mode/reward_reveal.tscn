@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://reward_reveal"]
+
+[ext_resource type="Script" path="res://src/child_mode/reward_reveal.gd" id="1_rev"]
+
+[node name="RewardReveal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rev")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="StickerLabel" type="Label" parent="Center/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "UNBOXING..."
+horizontal_alignment = 1
+
+[node name="EggSprite" type="TextureRect" parent="Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+pivot_offset = Vector2(150, 200)
+
+[node name="ClaimButton" type="Button" parent="Center/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "CLAIM REWARD"
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+
+[connection signal="pressed" from="Center/VBox/ClaimButton" to="." method="_on_claim_button_pressed"]
